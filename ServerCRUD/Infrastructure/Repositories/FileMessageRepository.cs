@@ -1,10 +1,24 @@
-﻿using ServerCRUD.Core.Domain.Entities;
+﻿using System.Runtime.InteropServices;
+using ServerCRUD.Core.Domain.Entities;
 using ServerCRUD.Core.DomainServices;
 
 namespace ServerCRUD.Infrastructure.Repositories
 {
     public class FileMessageRepository : IMessageRepository
     {
+        private readonly string _msgPath;
+        public FileMessageRepository(string path)
+        {
+            if (Directory.Exists(path))
+                Console.WriteLine("Folder found");
+            else
+            {
+                Console.WriteLine("Folder not found");
+                Directory.CreateDirectory(path);
+            }
+            _msgPath = path;
+        }
+
         Message IMessageRepository.CreateMessage(Message message)
         {
             throw new NotImplementedException();

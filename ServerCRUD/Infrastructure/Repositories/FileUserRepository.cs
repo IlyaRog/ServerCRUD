@@ -1,48 +1,108 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.IO;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.Xml.Linq;
 using ServerCRUD.Core.Domain.Entities;
 using ServerCRUD.Core.DomainServices;
+using ServerCRUD.Infrastructure.Settings;
 
 namespace ServerCRUD.Infrastructure.Repositories
 {
     public class FileUserRepository : IUserRepository
     {
-        User IUserRepository.CreateUser(User user)
+        private readonly string _usersPath;
+        public FileUserRepository(string path) 
         {
-            throw new NotImplementedException();
+            if (Directory.Exists(path))
+                Console.WriteLine("Folder found");
+            else
+            {
+                Console.WriteLine("Folder not found");
+                Directory.CreateDirectory(path);
+            }
+            
+            _usersPath = path;
         }
 
-        void IUserRepository.DeleteById(int id)
+        public User CreateUser(string login, string password, string phone, int age, string mail)
         {
-            throw new NotImplementedException();
+            var files = Directory.GetFiles(_usersPath, "*.json");
+
+            var ids = files.Select(file =>
+            {
+                var name = Path.GetFileNameWithoutExtension(file);
+                return int.TryParse(name, out int id) ? id : -1;
+            }
+            ).Where(id => id >= 0);
+
+            int newId = ids.Any() ? ids.Max() + 1 : 1;
+
+            User newUser = new(newId, Role.Default, login, password, phone, age, mail);
+
+            string json = JsonSerializer.Serialize(newUser, new JsonSerializerOptions{WriteIndented = true});
+            string filePath = Path.Combine(_usersPath, $"{newUser.Id}.json");
+            File.WriteAllText(filePath, json);
+
+            return newUser;
         }
 
-        User IUserRepository.GetById(int id)
+        public void DeleteById(int id)
         {
-            throw new NotImplementedException();
+            var filePath = Path.Combine(_usersPath, $"{id}.json");
+            if (!Directory.Exists(filePath)) File.Delete(filePath);
+            else Console.WriteLine("File not found");
         }
 
-        User IUserRepository.GetByLogin(string login)
+        public User GetById(int id)
         {
-            throw new NotImplementedException();
-        }
+            string json;
 
-        User IUserRepository.GetByMail(string mail)
-        {
-            throw new NotImplementedException();
-        }
+            var filePath = Path.Combine(_usersPath, $"{id}.json");
+            if (!Directory.Exists(filePath)) json = File.ReadAllText(filePath);
+            else throw new Exception("User not found"); ;
 
-        User IUserRepository.GetByPhone(string phone)
-        {
-            throw new NotImplementedException();
+            User user = JsonSerializer.Deserialize<User>(json) ?? throw new Exception("Error. You cannot deserialize null to a user.");
+            return user;
         }
-
-        User IUserRepository.UpdateDataUser(User user)
+        public User GetByLogin(string login)
         {
-            throw new NotImplementedException();
+            var files = Directory.GetFiles(_usersPath, "*.json");
+
+            foreach (var file in files) 
+            {
+                string json = File.ReadAllText(file);
+                try
+                {
+                    var user = JsonSerializer.Deserialize<User>(json);
+                    if (user != null && user.Login == login) return user;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error processing file {file}: {ex.Message}");
+                }
+            }
+            throw new Exception($"Error, user.login:{login} not found");
+        }
+        public User UpdateDataUser(int id, Action<User> updateAction)
+        {
+            var files = Directory.GetFiles(_usersPath, "*.json");
+
+            foreach (var file in files)
+            {
+                string json = File.ReadAllText(file);
+                var user = JsonSerializer.Deserialize<User>(json);
+
+                if(user != null && user.Id == id)
+                {
+                    updateAction(user);
+                    var options = new JsonSerializerOptions { WriteIndented = true };
+                    string updatedJson = JsonSerializer.Serialize(user, options);
+                    File.WriteAllText(file, updatedJson);
+                    
+                    return user;
+                }
+            }
+            throw new Exception($"User with ID:{id} is not found");
         }
     }
 }

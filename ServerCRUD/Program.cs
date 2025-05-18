@@ -1,4 +1,7 @@
-﻿using ServerCRUD.Core.Domain.Entities;
+﻿using System.Text.Json;
+using System.Threading.Channels;
+using ServerCRUD.Infrastructure.Repositories;
+using ServerCRUD.Infrastructure.Settings;
 
 namespace ServerCRUD
 {
@@ -6,7 +9,21 @@ namespace ServerCRUD
     {
         static void Main(string[] args)
         {
-            new User(1, Role.Admin, "Vad1ch", "1666", "+79115880650", 21, "IlyaRogOfficial@yandex.ru");
+            /*Существует некий json, в котором храниться путь к локальной папке,
+                                                         например с данными о пользователях.
+            There is a json file containing a pair of "filesUsersPath" : ".../Path/"
+            */
+            
+            string json = File.ReadAllText("config.json");
+            var config = JsonSerializer.Deserialize<ConfigRoot>(json) ?? throw new Exception("Error");
+
+            string userDirPath = config.FileStorage.filesUsersPath;
+            string messageDirPath = config.FileStorage.filesMessagesPath;
+
+            FileMessageRepository fileMsgRep = new(messageDirPath);
+            FileUserRepository fileUsersRep = new(userDirPath);
+
+
         }
     }
 }

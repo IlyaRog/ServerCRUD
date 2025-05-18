@@ -11,9 +11,26 @@
         public DateTime? DateDelete { get; private set; }
         public string Text { get; private set; }
 
-        public Message(int id, User sender, User recipient, MessageStatus status, DateTime DateSend, string Text)
+        public Message(int id, User sender, User recipient, MessageStatus status, string text)
         {
-            //Дописать конструктор, методы обновления статуса и свойств DateTime
+            if(String.IsNullOrWhiteSpace(text)) throw new ArgumentException("Text is not correct");
+
+            Id = id;
+            Sender = sender;
+            Recipient = recipient;
+            Status = status;
+            DateSend = DateTime.Now;
+            Text = text;
         }
+        
+        private void RefreshDateUpdate() => DateUpdate = DateTime.Now;
+        private void RefreshDateDelete() => DateDelete = DateTime.Now;
+        private void RefreshStatus(MessageStatus status) => Status = status;
+
+        
+        public void MarkAsSendError() => RefreshStatus(MessageStatus.SendingError);
+        public void MarkAsSend() => RefreshStatus(MessageStatus.IsSent);
+        public void MarkAsRead() => RefreshStatus(MessageStatus.IsRead);
+
     }
 }

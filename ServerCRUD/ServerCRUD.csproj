@@ -8,8 +8,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Core\DomainServices\" />
-    <Folder Include="Core\Application\" />
     <Folder Include="Infrastructure\Logging\" />
     <Folder Include="Infrastructure\Tests\" />
     <Folder Include="Infrastructure\UI\" />

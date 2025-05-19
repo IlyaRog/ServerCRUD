@@ -23,8 +23,6 @@ namespace ServerCRUD
 
             FileMessageRepository fileMsgRep = new(messageDirPath);
             FileUserRepository fileUsersRep = new(userDirPath);
-
-            fileMsgRep.CreateMessage(1, 2, "Привет, Мир! Hello World!");
         }
     }
 }

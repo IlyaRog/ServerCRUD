@@ -1,4 +1,6 @@
-﻿namespace ServerCRUD.Core.Domain.Entities
+﻿using System.Text.Json.Serialization;
+
+namespace ServerCRUD.Core.Domain.Entities
 {
     public class Message
     {
@@ -18,6 +20,7 @@
             Status = status; 
             Text = text; 
         }
+        [JsonConstructor]
         public Message(int id, MessageStatus status, string text, int senderId, int recipientId):this(id, status, text) 
         {
             SenderId = senderId;
@@ -34,6 +37,10 @@
         public void MarkAsSendError() => RefreshStatus(MessageStatus.SendingError);
         public void MarkAsSend() => RefreshStatus(MessageStatus.IsSent);
         public void MarkAsRead() => RefreshStatus(MessageStatus.IsRead);
-
+        public void TextUpdate(string text) => Text = text;
+        public override string ToString()
+        {
+            return $"\nStatus:{Status}\nДата отправки: {DateSend}\nОт кого: {SenderId}\nДля кого: {RecipientId}\n\"{Text}\"\n";
+        }
     }
 }

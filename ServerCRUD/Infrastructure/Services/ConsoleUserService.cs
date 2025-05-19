@@ -4,11 +4,11 @@ using ServerCRUD.Core.DomainServices;
 
 namespace ServerCRUD.Infrastructure.Services
 {
-    public class UserService : IUserService
+    public class ConsoleUserService : IUserService
     {
         private readonly IUserRepository _userRepo;
 
-        public UserService(IUserRepository userRepo) => _userRepo = userRepo;
+        public ConsoleUserService(IUserRepository userRepo) => _userRepo = userRepo;
 
         void IUserService.DeleteUser(int userId)
         {

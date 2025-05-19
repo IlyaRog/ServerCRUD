@@ -8,11 +8,11 @@ using ServerCRUD.Core.DomainServices;
 
 namespace ServerCRUD.Infrastructure.Services
 {
-    public class MessageService : IMessageService
+    public class ConsoleMessageService : IMessageService
     {
         private readonly IMessageRepository _messageRepo;
 
-        public MessageService(IMessageRepository messageRepo) => _messageRepo = messageRepo;
+        public ConsoleMessageService(IMessageRepository messageRepo) => _messageRepo = messageRepo;
 
         void IMessageService.DeleteMessage(int senderId, int messageId)
         {

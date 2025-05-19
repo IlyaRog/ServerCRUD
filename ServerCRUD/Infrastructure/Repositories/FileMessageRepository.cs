@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.ComponentModel.Design;
+using System.Runtime.InteropServices;
 using System.Text.Json;
 using ServerCRUD.Core.Domain.Entities;
 using ServerCRUD.Core.DomainServices;
@@ -41,24 +42,71 @@ namespace ServerCRUD.Infrastructure.Repositories
             return newMessage;
         }
 
-        Message IMessageRepository.DeleteMessage(int id)
+        public void DeleteMessage(int id)
         {
-            throw new NotImplementedException();
+            var filePath = Path.Combine(_msgPath, $"{id}.json");
+            if (!Directory.Exists(filePath)) File.Delete(filePath);
+            else Console.WriteLine("File not found");
         }
 
-        List<Message> IMessageRepository.GetAllMessages(int senderId, int recipierId)
+        public List<Message> GetAllMessages(int senderId, int recipierId)
         {
-            throw new NotImplementedException();
+            List<Message> messages = new List<Message>();
+
+            var files = Directory.GetFiles(_msgPath, "*.json");
+            foreach (string file in files)
+            {
+                var json = File.ReadAllText(file);
+                try
+                {
+                    var message = JsonSerializer.Deserialize<Message>(json);
+
+                    if (message.SenderId == senderId && message.RecipientId == recipierId)
+                    {
+                        messages.Add(message);
+                    }
+                }
+                catch (Exception ex) 
+                {
+                    Console.WriteLine($"Error processing file {file}: {ex.Message}");
+                }
+            }
+            return messages.OrderBy(m => m.DateSend).ToList();
         }
 
-        Message IMessageRepository.GetById(User sender, int id)
+        public Message GetById(int id)
         {
-            throw new NotImplementedException();
+            string json;
+
+            var filePath = Path.Combine(_msgPath, $"{id}.json");
+            if (!Directory.Exists(filePath)) json = File.ReadAllText(filePath);
+            else throw new Exception("Message not found");
+            
+            Message message = JsonSerializer.Deserialize<Message>(json) ?? throw new Exception("Error. You cannot deserialize null to a message.");
+
+            return message;
         }
 
-        Message IMessageRepository.UpdateMessage(Message message)
+        public Message UpdateMessage(int id, Action<Message> updateAction)
         {
-            throw new NotImplementedException();
+            var files = Directory.GetFiles(_msgPath, "*.json");
+
+            foreach (var file in files)
+            {
+                string json = File.ReadAllText(file);
+                var message = JsonSerializer.Deserialize<Message>(json);
+
+                if (message != null && message.Id == id)
+                {
+                    updateAction(message);
+                    var options = new JsonSerializerOptions { WriteIndented = true };
+                    string updatedJson = JsonSerializer.Serialize(message, options);
+                    File.WriteAllText(file, updatedJson);
+
+                    return message;
+                }
+            }
+            throw new Exception($"Message with ID:{id} is not found");
         }
     }
 }

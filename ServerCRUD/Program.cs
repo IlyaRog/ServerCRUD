@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using System.Threading.Channels;
+using ServerCRUD.Core.Domain.Entities;
 using ServerCRUD.Infrastructure.Repositories;
 using ServerCRUD.Infrastructure.Settings;
 
@@ -23,7 +24,7 @@ namespace ServerCRUD
             FileMessageRepository fileMsgRep = new(messageDirPath);
             FileUserRepository fileUsersRep = new(userDirPath);
 
-
+            fileMsgRep.CreateMessage(1, 2, "Привет, Мир! Hello World!");
         }
     }
 }

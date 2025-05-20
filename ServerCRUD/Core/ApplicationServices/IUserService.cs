@@ -4,7 +4,7 @@ namespace ServerCRUD.Core.ApplicationServices
 {
     public interface IUserService
     {
-        User Register(string login, string password, string phone, int age, string mail);
+        User Register(string nickname, string login, string password, string phone, DateTime birthDay, string mail);
         User GetUserById(int id);
         User GetUserBylogin(string login);
         void UpdatePassword(int userId, string password);

@@ -4,7 +4,7 @@ namespace ServerCRUD.Core.DomainServices
 {
     public interface IUserRepository
     {
-        User CreateUser(string login, string password, string phone, int age, string mail);
+        User CreateUser(string nickname, string login, string password, string phone, DateTime birthDay, string mail);
         User GetById(int id);
         User GetByLogin(string login);
         User UpdateDataUser(int id, Action<User> updateAction);

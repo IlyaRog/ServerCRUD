@@ -1,4 +1,5 @@
-﻿using ServerCRUD.Core.ApplicationServices;
+﻿using System.Reflection.Metadata.Ecma335;
+using ServerCRUD.Core.ApplicationServices;
 using ServerCRUD.Core.Domain.Entities;
 using ServerCRUD.Core.DomainServices;
 
@@ -12,31 +13,31 @@ namespace ServerCRUD.Infrastructure.Services
 
         void IUserService.DeleteUser(int userId)
         {
-            throw new NotImplementedException();
+            _userRepo.DeleteById(userId);
         }
         User IUserService.GetUserById(int id)
         {
-            throw new NotImplementedException();
+            return _userRepo.GetById(id);
         }
         User IUserService.GetUserBylogin(string login)
         {
-            throw new NotImplementedException();
+            return _userRepo.GetByLogin(login);
         }
-        User IUserService.Register(string login, string password, string phone, int age, string mail)
+        User IUserService.Register(string nickname, string login, string password, string phone, DateTime birthDay, string mail)
         {
-            throw new NotImplementedException();
+            return _userRepo.CreateUser(nickname, login, password, phone, birthDay, mail);
         }
-        void IUserService.UpdateEmail(int userId, string email)
+        void IUserService.UpdateEmail(int userId, string mail)
         {
-            throw new NotImplementedException();
+            _userRepo.UpdateDataUser(userId, f => f.UpdateMail(mail));
         }
         void IUserService.UpdatePassword(int userId, string password)
         {
-            throw new NotImplementedException();
+            _userRepo.UpdateDataUser(userId,f => f.UpdatePassword(password));
         }
         void IUserService.UpdatePhone(int userId, string phone)
         {
-            throw new NotImplementedException();
+            _userRepo.UpdateDataUser(userId, f => f.UpdatePhoneNumber(phone));
         }
     }
 }

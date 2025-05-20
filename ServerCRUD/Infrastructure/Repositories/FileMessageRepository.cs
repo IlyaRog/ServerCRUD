@@ -33,7 +33,7 @@ namespace ServerCRUD.Infrastructure.Repositories
             ).Where(id => id >= 0);
 
             int newId = ids.Any() ? ids.Max() + 1 : 1;
-            Message newMessage = new(newId, MessageStatus.IsSent, text, senderId, recipientId);
+            Message newMessage = Message.Create(newId, MessageStatus.IsSent, text, senderId, recipientId);
 
             string json = JsonSerializer.Serialize(newMessage, new JsonSerializerOptions { WriteIndented = true });
             string filePath = Path.Combine(_msgPath, $"{newMessage.Id}.json");

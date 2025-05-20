@@ -24,7 +24,7 @@ namespace ServerCRUD.Infrastructure.Repositories
             _usersPath = path;
         }
 
-        public User CreateUser(string login, string password, string phone, int age, string mail)
+        public User CreateUser(string nickname, string login, string password, string phone, DateTime birthDay, string mail)
         {
             var files = Directory.GetFiles(_usersPath, "*.json");
 
@@ -37,7 +37,7 @@ namespace ServerCRUD.Infrastructure.Repositories
 
             int newId = ids.Any() ? ids.Max() + 1 : 1;
 
-            User newUser = new(newId, Role.Default, login, password, phone, age, mail);
+            User newUser = User.Create(newId, Role.Default, nickname, login, password, phone, birthDay, mail);
 
             string json = JsonSerializer.Serialize(newUser, new JsonSerializerOptions{WriteIndented = true});
             string filePath = Path.Combine(_usersPath, $"{newUser.Id}.json");
